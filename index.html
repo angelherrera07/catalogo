@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo</title>
+  <style>
+    :root {
+      --fondo: #f7f7f5;
+      --tarjeta: #ffffff;
+      --texto: #1d1d1b;
+      --secundario: #6b6b66;
+      --acento: #25d366;
+      --acento-texto: #ffffff;
+      --borde: #e4e4df;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --fondo: #161614;
+        --tarjeta: #222220;
+        --texto: #f2f2ee;
+        --secundario: #a3a39c;
+        --borde: #33332f;
+      }
+    }
+    :root[data-theme="dark"] {
+      --fondo: #161614;
+      --tarjeta: #222220;
+      --texto: #f2f2ee;
+      --secundario: #a3a39c;
+      --borde: #33332f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    header {
+      padding: 24px 16px 8px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    header p { margin: 0; color: var(--secundario); font-size: 0.95rem; }
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .producto {
+      background: var(--tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .producto img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: var(--borde);
+    }
+    .info {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .nombre { margin: 0; font-size: 1rem; font-weight: 600; }
+    .precio { margin: 0; font-size: 1.05rem; font-weight: 700; }
+    .boton {
+      margin-top: auto;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      background: var(--acento);
+      color: var(--acento-texto);
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .vacio {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--secundario);
+      padding: 40px 0;
+    }
+    footer {
+      text-align: center;
+      color: var(--secundario);
+      font-size: 0.85rem;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Catálogo</h1>
+    <p>Precios en pesos colombianos (COP)</p>
+  </header>
+
+  <main id="catalogo"></main>
+
+  <footer>
+    <p>Para pedir un producto, toca el botón de WhatsApp.</p>
+  </footer>
+
+  <script>
+    // n8n reemplaza esta línea con los productos ya calculados.
+    // precio = precio final en COP, con el margen ya aplicado.
+    const PRODUCTOS = [
+      { nombre: "Producto de ejemplo 1", foto: "fotos/ejemplo1.jpg", precio: 150000 },
+      { nombre: "Producto de ejemplo 2", foto: "fotos/ejemplo2.jpg", precio: 89900 }
+    ];
+
+    const WHATSAPP = "573233219985";
+    const formato = new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0
+    });
+
+    function enlaceWhatsApp(nombre) {
+      const mensaje = `Hola, me interesa el producto: ${nombre}`;
+      return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
+    }
+
+    function tarjeta(p) {
+      const el = document.createElement("article");
+      el.className = "producto";
+      el.innerHTML = `
+        <img src="" alt="">
+        <div class="info">
+          <h2 class="nombre"></h2>
+          <p class="precio"></p>
+          <a class="boton" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+        </div>`;
+      el.querySelector("img").src = p.foto;
+      el.querySelector("img").alt = p.nombre;
+      el.querySelector(".nombre").textContent = p.nombre;
+      el.querySelector(".precio").textContent = formato.format(p.precio);
+      el.querySelector(".boton").href = enlaceWhatsApp(p.nombre);
+      return el;
+    }
+
+    const contenedor = document.getElementById("catalogo");
+    if (PRODUCTOS.length === 0) {
+      contenedor.innerHTML = '<p class="vacio">Pronto habrá productos disponibles.</p>';
+    } else {
+      PRODUCTOS.forEach(p => contenedor.appendChild(tarjeta(p)));
+    }
+  </script>
+</body>
+</html>
